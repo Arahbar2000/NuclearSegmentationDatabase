@@ -146,6 +146,30 @@ def example_add_metadata_twice():
     print("Added metadata a second time")
 
 
+def example_read_tile_items():
+    """Example showing how to read all nuclear data for a tile. This is the preferred method to
+    extract data from a patch containing thousands of items.
+    """
+    my_collection = "b123__p123__20201025"
+    jdb = dba.JsonDatabase(user=USER, password=PASSWORD, collection_name=my_collection, create_coll=True)
+
+    # Create four segments, two of which are in the tile starting at (256, 0) in layer 0.
+    it1 = generate_one_item_at_position(270, 20, 0)
+    it2 = generate_one_item_at_position(300, 100, 0)
+    it3 = generate_one_item_at_position(600, 600, 0)
+    it4 = generate_one_item_at_position(270, 40, 1)
+
+    items = [it1, it2, it3, it4]
+
+    jdb.add_multiple_items(items_list=items)
+    print("Items added to the database")
+    # Retrieve the tile items
+    tile_data = jdb.extract_tile_data(z_layer=0, x0=256, y0=0)
+    print("Retrieved data:")
+    for entry in tile_data:
+        print(entry)
+
+
 def generate_one_item():
     """Generate a dummy item for database insert operations. It generates an item with different area,
     perimeter, x, y, and z values."""
@@ -186,6 +210,24 @@ def generate_one_item_at_layer(z_layer):
     return item
 
 
+def generate_one_item_at_position(x, y, z):
+    """Generate a dummy item for database insert operations. It generates an item at position
+    (x, y, z) with random area and perimeter values.
+    """
+    target_area = int(np.random.uniform(400, 600))
+    target_perimeter = int(np.random.uniform(100, 220))
+
+    item = dict()
+    item["type"] = "Feature"
+    item["geometry"] = {"type": "Point", "coordinates": [x, y, z]}
+    item["properties"] = {
+        "rle": "2098177 8 2100225 8 2102273 8 2104321 8 2106369 8 2108417 8 2110465 8 2112513 8",
+        "area": target_area,
+        "perimeter": target_perimeter,
+    }
+    return item
+
+
 if __name__ == "__main__":
 
     # Add an item to the database
@@ -198,7 +240,7 @@ if __name__ == "__main__":
     # example_delete_collection()
 
     # List collections
-    example_list_collections()
+    # example_list_collections()
 
     # Insert multiple items
     # example_add_multiple_items()
@@ -213,3 +255,6 @@ if __name__ == "__main__":
 
     # Attempt to add metadata twice. It should return an error.
     # example_add_metadata_twice()
+
+    # Read tile items from the database
+    example_read_tile_items()

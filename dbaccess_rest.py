@@ -216,6 +216,41 @@ class JsonDatabase:
             error_msg = str(resp.get("code")) + " " + resp.get("reason")
             raise DatabaseUnableToExtractData(message=error_msg)
 
+    def extract_tile_data(self, z_layer, x0, y0, tile_size=256):
+        """Extract nuclear data for a tile of a given size whose origin is at (x0, y0).
+
+        Note: This function uses the $between comparison operator to check if a point belongs to
+        a tile. We may want to replace this operation and use the $within operator for GeoJson data. It
+        might be a faster way to perform queries.
+        """
+        xf = x0 + tile_size - 1
+        yf = y0 + tile_size - 1
+        extract_url = self.__baseurl + "?action=query"
+        qdata = {"geometry.coordinates[2]": {"$eq": z_layer},
+                 "geometry.coordinates[0]": {"$between": [x0, xf]},
+                 "geometry.coordinates[1]": {"$between": [y0, yf]},
+                 }
+
+        resp = self.__make_post_request(target_url=extract_url, payload_dict=qdata)
+        if resp['status'] == 'ok':
+            returned_data = json.loads(resp.get("data"))
+            all_items = returned_data.get("items")
+            count = returned_data.get("count")
+            has_more = returned_data.get("hasMore")
+
+            if has_more:
+                print("Warning: Only {} items extracted for tile with origin at ({}, {})".format(count, x0, y0))
+                print("         Database reports having more items. Consider reducing the tile size.")
+
+            if count > 0:
+                extracted = [copy.deepcopy(it.get("value")) for it in all_items]
+                return extracted
+            else:
+                return []
+        else:
+            error_msg = str(resp.get("code")) + " " + resp.get("reason")
+            raise DatabaseUnableToExtractData(message=error_msg)
+
     def __make_post_request(self, target_url, payload_dict):
         # Note: the json argument automatically sets the content-type header to application/json
         resp = requests.post(url=target_url, auth=(self.__user, self.__pword), json=payload_dict)
