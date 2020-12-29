@@ -48,6 +48,10 @@ as environment variables.
 
 6. Retrieve all nuclear segment entries for a z layer
 
+7. Add a metadata document to a collection
+
+8. Read the metadata document for a collection
+
 ### Naming and Format conventions
 
 The names and formats follow the Segmentation Pipeline specifications: 
