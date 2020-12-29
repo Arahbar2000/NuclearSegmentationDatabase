@@ -52,16 +52,13 @@ as environment variables.
 
 8. Read the metadata document for a collection
 
+9. Extract tile data (allows reading patch data tile by tile). This should be 
+the preferred method to read patch data
+
 ### Naming and Format conventions
 
-The names and formats follow the Segmentation Pipeline specifications: 
+The names of fields and data representation formats follow the Segmentation Pipeline specifications: 
 https://www.dropbox.com/sh/uc6i1pcp7jra0hh/AADfpmX9Xw0MAXuZju7_-gova?dl=0
-
-### In-Progress Work
-
-1. The retrieval method cannot retrieve yet large numbers of 
-database entries. We are designing a method to retrieve data
-   via tiles.
 
 
 
