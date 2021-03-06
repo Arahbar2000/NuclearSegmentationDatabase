@@ -1,4 +1,5 @@
 """ Autonomous JSON Database (AJD) access using REST APIs.
+
 Define a class and helper functions to store and retrieve data from
 a managed JSON database from Oracle. The APIs defined here use SODA
 commands exchanged using a REST protocol.
