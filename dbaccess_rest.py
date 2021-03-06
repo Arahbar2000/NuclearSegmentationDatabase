@@ -61,7 +61,8 @@ class JsonDatabase:
            raises an error. If the flag is False, the named collection should be available
            prior to instantiation.
     """
-    def __init__(self, user, password, collection_name, create_coll=False):
+
+    def __init__(self, user, password, collection_name, create_coll=False, overwrite=False):
         self.__user = user
         self.__pword = password
         self.__collname = collection_name
@@ -70,14 +71,17 @@ class JsonDatabase:
         self.__baseurl = ct.DB_BASE_URL + url_tail
 
         if create_coll:
-            self.__create_collection()
+            self.__create_collection(overwrite)
 
-    def __create_collection(self):
+    def __create_collection(self, overwrite):
         """Create a new collection in the database"""
         all_colls = self.list_collections()
         if self.__collname in all_colls:
-            raise DatabaseCollectionExists(
-                "{} already exists".format(self.__collname))
+            if overwrite:
+                self.delete_collection()
+            else:
+                raise DatabaseCollectionExists(
+                    "{} already exists".format(self.__collname))
         resp = requests.put(url=self.__baseurl,
                             auth=(self.__user, self.__pword))
         if resp.status_code > 299:
@@ -204,7 +208,8 @@ class JsonDatabase:
         has_more = True
         items = []
         while has_more:
-            extract_url = self.__baseurl + "?action=query&offset={}".format(offset)
+            extract_url = self.__baseurl + \
+                "?action=query&offset={}".format(offset)
             qdata = {"geometry.coordinates[2]": {"$eq": z_layer}}
             resp = self.__make_post_request(
                 target_url=extract_url, payload_dict=qdata)
@@ -236,7 +241,8 @@ class JsonDatabase:
         has_more = True
         items = []
         while has_more:
-            extract_url = self.__baseurl + "?action=query&offset={}".format(offset)
+            extract_url = self.__baseurl + \
+                "?action=query&offset={}".format(offset)
             qdata = {"geometry.coordinates[2]": {"$eq": z_layer},
                      "geometry.coordinates[0]": {"$between": [x0, xf]},
                      "geometry.coordinates[1]": {"$between": [y0, yf]},
@@ -264,7 +270,8 @@ class JsonDatabase:
         has_more = True
         items = []
         while has_more:
-            extract_url = self.__baseurl + "?action=query&offset={}".format(offset)
+            extract_url = self.__baseurl + \
+                "?action=query&offset={}".format(offset)
             qdata = {"geometry.coordinates[2]": {"$eq": z_layer},
                      "geometry.coordinates[0]": {"$between": [x0, xf]},
                      "geometry.coordinates[1]": {"$between": [y0, yf]},
