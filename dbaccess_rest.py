@@ -61,7 +61,6 @@ class JsonDatabase:
            raises an error. If the flag is False, the named collection should be available
            prior to instantiation.
     """
-
     def __init__(self, user, password, collection_name, create_coll=False):
         self.__user = user
         self.__pword = password
