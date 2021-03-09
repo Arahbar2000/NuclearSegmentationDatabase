@@ -266,6 +266,10 @@ class JsonDatabase:
         return items
 
     def extract_region(self, z_layer, x0, y0, xf, yf):
+        """Extract nuclei data for a specified bounding box at specified layer. 
+        The top left coordinate of the bounding box is (x0, y0) and the bottom 
+        right coordinate is (xf, yf).
+        """
         offset = 0
         has_more = True
         items = []
